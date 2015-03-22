@@ -1,0 +1,176 @@
+<apex:page controller="CheckInViewerCtrl"
+           docType="html-5.0"
+           sidebar="false"
+           showHeader="{!showSFHeader}"
+           standardStylesheets="false"
+           cache="false">
+
+    <apex:composition template="almond__LMS_Template">
+        <apex:define name="head">
+            <title>Plugin Viewer</title>
+            <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+            <meta charset="utf-8"/>
+            <style>
+                html, body, #map-canvas {
+                    height: 600px;
+                    margin: 0px;
+                    padding: 0px
+                }
+                #map-canvas {
+                    margin-top:20px;
+                }
+            </style>
+            <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+            <script>
+
+                var map;
+                var current_position;
+
+                function initialize() {
+
+                    var mapOptions = {
+                      zoom: 13
+                    };
+
+                    map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
+
+                    // Try HTML5 geolocation
+                    if(navigator.geolocation) {
+                          navigator.geolocation.getCurrentPosition(function(position) {
+                              var pos = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+
+                              current_position = pos;
+
+                              var checkin_lat = {!learningVersion.Checkin__r.Checkin_Location__latitude__s};
+                              var checkin_lng = {!learningVersion.Checkin__r.Checkin_Location__longitude__s};
+                              var checkin_radius = {!learningVersion.Checkin__r.Mile_Radius__c};
+
+                              var checkin_pos = new google.maps.LatLng(checkin_lat, checkin_lng);
+
+                              var marker = marker = new google.maps.Marker({
+                                    position: checkin_pos,
+                                    map: map,
+                                    title: 'Check-In Here!'
+                              });
+
+                              // Add circle overlay and bind to marker
+                              var circle = new google.maps.Circle({
+                                  map: map,
+                                  radius: checkin_radius*1609.34,
+                                  fillColor: '#AA0000'
+                              });
+
+                              circle.bindTo('center', marker, 'position');
+
+                              var infowindow = new google.maps.InfoWindow({
+                                map: map,
+                                position: pos,
+                                content: 'You are here!'
+                              });
+
+                              map.setCenter(pos);
+                          },
+                          function(){
+                            handleNoGeolocation(true);
+                          });
+                    }else{
+                        // Browser doesn't support Geolocation
+                        handleNoGeolocation(false);
+                    }
+                }
+
+                function handleNoGeolocation(errorFlag) {
+                    if(errorFlag) {
+                        var content = 'Error: The Geolocation service failed.';
+                    }else{
+                        var content = 'Error: Your browser doesn\'t support geolocation.';
+                    }
+
+                    var options = {
+                        map: map,
+                        position: new google.maps.LatLng(60, 105),
+                        content: content
+                    };
+
+                    var infowindow = new google.maps.InfoWindow(options);
+                    map.setCenter(options.position);
+                }
+
+                google.maps.event.addDomListener(window, 'load', initialize);
+
+                function doCheckIn(assignmentId){
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.CheckInViewerCtrl.doCheckIn}',
+                        assignmentId,
+                        current_position.lat(),
+                        current_position.lng(),
+                        function(result, event){
+                            if (event.status) {
+                                var decodedURL = result.replace(/&amp\;/g, '&');
+                                almond.redirectHandler(decodedURL);
+                            } else if (event.type === 'exception') {
+                                alert(event.message);
+                            } else {
+                                alert(event.message);
+                            }
+                        }
+                    );
+                }
+
+                function doCancel(assignmentId){
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.CheckInViewerCtrl.doCancel}',
+                        assignmentId,
+                        function(result, event){
+                            if (event.status) {
+                                var decodedURL = result.replace(/&amp\;/g, '&');
+                                almond.redirectHandler(decodedURL);
+                            } else if (event.type === 'exception') {
+                                alert(event.message);
+                            } else {
+                                alert(event.message);
+                            }
+                        }
+                    );
+                }
+
+            </script>
+        </apex:define>
+
+        <apex:define name="pre-body">
+            <!-- Anything defined here will be added before the body container div -->
+        </apex:define>
+
+        <apex:define name="body">
+
+            <div class="row">
+                <div class="col-md-12"><h3>{!learning.Name}</h3></div>
+            </div>
+            <div class="row">
+                <div class="col-md-12"><p>{!learning.almond__Description__c}</p></div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div id="checkin-button" class="almond-default-btn large-btn" onclick="doCheckIn('{!JSENCODE($CurrentPage.parameters.aid)}');" style="margin-top:15px;">Check-In!</div>
+                </div>
+                <div class="col-md-6">
+                    <div id="checkin-button" class="almond-danger-btn large-btn" onclick="doCancel('{!JSENCODE($CurrentPage.parameters.aid)}');" style="margin-top:15px;">Cancel</div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="map-canvas"></div>
+                </div>
+            </div>
+
+            <!-- Use jQuery and S1 Navigation Utils provided by almond -->
+            <apex:includeScript value="{!URLFOR($Resource.almond__almond_uilib, '/js/jquery.min.js')}"/>
+            <apex:includeScript value="{!URLFOR($Resource.almond__almond_uilib, '/js/almondutils.js')}"/>
+
+        </apex:define>
+
+    </apex:composition>
+
+</apex:page>

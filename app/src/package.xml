@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>*</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>ApexPage</name>
+    </types>
+    <types>
+        <members>CheckIn__c</members>
+        <members>almond__Learning_Version__c</members>
+        <members>almond__Learning__c</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
+        <members>CheckIn__c-en_US</members>
+        <members>almond__Learning_Version__c-en_US</members>
+        <members>almond__Learning__c-en_US</members>
+        <name>CustomObjectTranslation</name>
+    </types>
+    <types>
+        <members>CheckIn__c-CheckIn Layout</members>
+        <members>almond__Learning__c-Learning-CheckIn Layout</members>
+        <name>Layout</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>StaticResource</name>
+    </types>
+    <version>33.0</version>
+</Package>
