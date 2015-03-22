@@ -41,9 +41,9 @@
 
                               current_position = pos;
 
-                              var checkin_lat = {!learningVersion.Checkin__r.Checkin_Location__latitude__s};
-                              var checkin_lng = {!learningVersion.Checkin__r.Checkin_Location__longitude__s};
-                              var checkin_radius = {!learningVersion.Checkin__r.Mile_Radius__c};
+                              var checkin_lat = {!latitude};
+                              var checkin_lng = {!longitude};
+                              var checkin_radius = {!mileradius};
 
                               var checkin_pos = new google.maps.LatLng(checkin_lat, checkin_lng);
 

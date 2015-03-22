@@ -9,6 +9,12 @@ global with sharing class CheckInViewerCtrl{
     public almond__Learning_Version__c learningVersion{get;set;} //Learning version details
     public almond__Learning__c learning{get;set;} //Global learning header details
 
+    //We'll store lat and lng in separate variable to prevent FLS setup for end-users
+    //Ideally we should instruct users to configure permissions to the corresponding fields in permission sets or profiles
+    public Double latitude{get;private set;}
+    public Double longitude{get;private set;}
+    public Double mileradius{get;private set;}
+
     //Read the setting in almond that indicates if your viewer should show the SF header
     public Boolean showSFHeader{get{return almond.LMSSettings.getShowSalesforceHeader();}private set;}
 
@@ -42,6 +48,10 @@ global with sharing class CheckInViewerCtrl{
             CheckInViewerCtrl.WithoutSharingOps wsops = new CheckInViewerCtrl.WithoutSharingOps();
             learningVersion = wsops.getLearningVersionDetails(assignment.almond__Learning_Version__c);
             learning = wsops.getLearningDetails(assignment.almond__Learning__c);
+
+            latitude = learningVersion.Checkin__r.Checkin_Location__latitude__s;
+            longitude = learningVersion.Checkin__r.Checkin_Location__longitude__s;
+            mileradius = learningVersion.Checkin__r.Mile_Radius__c;
 
         }catch(Exception e){
             ApexPages.addMessages(e);
