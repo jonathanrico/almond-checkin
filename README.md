@@ -15,6 +15,7 @@ This expansion pack enables Check-In Learning Activities for Almond
 
   - Read access to the CheckIn Record Type in the Learning Object
   - Update the Learning Page Layout Assignments. Make sure the CheckIn record type is associated to the Learning CheckIn layout
+
   ---
   #####Object, Field and Visualforce permissions
 
